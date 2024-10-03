@@ -3,7 +3,7 @@ import { protectRoute } from "../middleware/protectRoute.js";
 
 import {
   createPost,
-  // likeUnlikePost,
+  likeUnlikePost,
   deletePost,
   commentPost,
   deleteComment,
@@ -11,7 +11,7 @@ import {
 const router = express.Router();
 
 router.post("/create", protectRoute, createPost);
-// router.post("/like/:id", protectRoute, likeUnlikePost);
+router.post("/like/:id", protectRoute, likeUnlikePost);
 router.post("/comment/:id", protectRoute, commentPost);
 router.delete("/comment/:postId/:id", protectRoute, deleteComment);
 router.delete("/:id", protectRoute, deletePost);

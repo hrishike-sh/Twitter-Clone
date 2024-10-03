@@ -131,3 +131,32 @@ export const deleteComment = async (req, res) => {
     res.status(500).json({ message: "ERROR" });
   }
 };
+
+export const likeUnlikePost = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { id } = req.params;
+
+    const post = await Post.findById(id);
+    if (!post) return res.status(404).json({ error: "Post not found" });
+
+    if (post.likes.includes(userId)) {
+      await Post.findByIdAndUpdate(id, {
+        $pull: {
+          likes: userId,
+        },
+      });
+      return res.status(201).json({ message: "Unliked" });
+    } else {
+      await Post.findByIdAndUpdate(id, {
+        $push: {
+          likes: userId,
+        },
+      });
+      return res.status(201).json({ message: "Liked" });
+    }
+  } catch (error) {
+    console.log("Error liking/unliking post: " + error);
+    return res.status(500).json({ error: "Error liking/unliking post!" });
+  }
+};
