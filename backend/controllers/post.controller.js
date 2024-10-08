@@ -23,7 +23,7 @@ export const createPost = async (req, res) => {
     const newPost = new Post({
       user: userId,
       text,
-      img,
+      img
     });
     await newPost.save();
     res.status(201).json(newPost);
@@ -34,7 +34,6 @@ export const createPost = async (req, res) => {
   }
 };
 
-
 export const deletePost = async (req, res) => {
   try {
     const { id } = req.params;
@@ -43,7 +42,7 @@ export const deletePost = async (req, res) => {
     const post = await Post.findById(id);
     if (!post) return res.status(404).json({ message: "Post not found" });
 
-    if (post.user.toString() !== userId) {
+    if (post.user.toString() !== userId.toString()) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
@@ -85,13 +84,13 @@ export const commentPost = async (req, res) => {
     const newComment = {
       user: userId,
       text,
-      img,
+      img
     };
 
     await Post.findByIdAndUpdate(id, {
       $push: {
-        comments: newComment,
-      },
+        comments: newComment
+      }
     });
 
     return res.status(201).json(newComment);
@@ -122,9 +121,9 @@ export const deleteComment = async (req, res) => {
     await Post.findByIdAndUpdate(postId, {
       $pull: {
         comments: {
-          _id: id,
-        },
-      },
+          _id: id
+        }
+      }
     });
 
     return res.status(200).json({ message: "Comment deleted!" });
@@ -145,25 +144,25 @@ export const likeUnlikePost = async (req, res) => {
     if (post.likes.includes(userId)) {
       await Post.findByIdAndUpdate(id, {
         $pull: {
-          likes: userId,
-        },
+          likes: userId
+        }
       });
       await User.findByIdAndUpdate(userId, {
         $pull: {
-          likedPosts: id,
-        },
+          likedPosts: id
+        }
       });
       return res.status(201).json({ message: "Unliked" });
     } else {
       await Post.findByIdAndUpdate(id, {
         $push: {
-          likes: userId,
-        },
+          likes: userId
+        }
       });
       await User.findByIdAndUpdate(userId, {
         $push: {
-          likedPosts: id,
-        },
+          likedPosts: id
+        }
       });
       return res.status(201).json({ message: "Liked" });
     }
@@ -180,11 +179,11 @@ export const getPosts = async (_, res) => {
       .limit(50)
       .populate({
         path: "user",
-        select: "-password",
+        select: "-password"
       })
       .populate({
         path: "comments.user",
-        select: "-password",
+        select: "-password"
       });
 
     if (posts.length == -1) return res.status(200).json([]);
@@ -204,15 +203,15 @@ export const getLikes = async (req, res) => {
       return res.status(404).json({ error: "Post not found!" });
     }
     const likedPosts = await Post.find({
-      _id: { $in: post.likedPosts },
+      _id: { $in: post.likedPosts }
     })
       .populate({
         path: "user",
-        select: "-password",
+        select: "-password"
       })
       .populate({
         path: "likes",
-        select: "-password",
+        select: "-password"
       });
     res.status(200).json(likedPosts);
   } catch (error) {
@@ -229,16 +228,16 @@ export const getFollowingPosts = async (req, res) => {
 
     const following = user.following;
     const feedPosts = await Post.find({
-      user: { $in: following },
+      user: { $in: following }
     })
       .sort({ createdAt: -1 })
       .populate({
         path: "user",
-        select: "-password",
+        select: "-password"
       })
       .populate({
         path: "comments.user",
-        select: "-password",
+        select: "-password"
       });
     return res.status(200).json(feedPosts);
   } catch (error) {
@@ -257,7 +256,7 @@ export const getUserPosts = async (req, res) => {
       .sort({ createdAt: -1 })
       .populate({
         path: "user",
-        select: "-password",
+        select: "-password"
       });
 
     return res.status(200).json(posts);
